@@ -1,0 +1,12 @@
+Source: ros-noetic-ros-industrial-cmake-boilerplate
+Section: misc
+Priority: optional
+Maintainer: Levi Armstrong <Levi.Armstrong@swri.org>
+Build-Depends: debhelper (>= 9.0.0), cppcheck, iwyu, lcov, libclang-dev, libgtest-dev
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-noetic-ros-industrial-cmake-boilerplate
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: Contains boilerplate cmake script, macros and utils

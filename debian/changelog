@@ -1,0 +1,33 @@
+ros-noetic-ros-industrial-cmake-boilerplate (0.2.6-1focal) focal; urgency=high
+
+  * Rename package to ros_industrial_cmake_boilerplate
+  * Contributors: Levi Armstrong
+
+ -- Levi Armstrong <Levi.Armstrong@swri.org>  Tue, 26 Jan 2021 06:00:00 -0000
+
+ros-noetic-ros-industrial-cmake-boilerplate (0.2.5-1focal) focal; urgency=high
+
+  * Bump version
+
+ -- Levi Armstrong <Levi.Armstrong@swri.org>  Tue, 05 Jan 2021 06:00:00 -0000
+
+ros-noetic-ros-industrial-cmake-boilerplate (0.2.4-1focal) focal; urgency=high
+
+  * Remove noetic.ignored which should go in the release repository
+
+ -- Levi Armstrong <Levi.Armstrong@swri.org>  Tue, 05 Jan 2021 06:00:00 -0000
+
+ros-noetic-ros-industrial-cmake-boilerplate (0.2.3-1focal) focal; urgency=high
+
+  * Add noetic.ignored to exclude gtest package during bloom release
+
+ -- Levi Armstrong <Levi.Armstrong@swri.org>  Tue, 05 Jan 2021 06:00:00 -0000
+
+ros-noetic-ros-industrial-cmake-boilerplate (0.2.1-1focal) focal; urgency=high
+
+  * Initial Release
+  * Contributors: Levi Armstrong, Michael Ripperger
+
+ -- Levi Armstrong <Levi.Armstrong@swri.org>  Tue, 05 Jan 2021 06:00:00 -0000
+
+
