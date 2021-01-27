@@ -23,5 +23,5 @@ tracks:
     release_tag: :{version}
     ros_distro: noetic
     vcs_type: git
-    vcs_uri: https://github.com/ros-industrial/cmake_common_scripts.git
+    vcs_uri: https://github.com/ros-industrial/ros_industrial_cmake_boilerplate.git
     version: :{auto}
