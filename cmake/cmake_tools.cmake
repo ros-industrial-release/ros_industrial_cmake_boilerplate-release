@@ -222,7 +222,6 @@ macro(find_gtest)
       endif()
     endif()
   endif()
-  include(GoogleTest)
 endmacro()
 
 # This macro call the appropriate gtest function to add a test based on the cmake version
@@ -231,7 +230,8 @@ macro(add_gtest_discover_tests target)
   if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
     gtest_add_tests(${target} "" AUTO)
   else()
-    gtest_discover_tests(${target})
+    include(GoogleTest)
+    gtest_discover_tests(${target} DISCOVERY_MODE PRE_TEST)
   endif()
 endmacro()
 
