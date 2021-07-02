@@ -26,16 +26,53 @@ mark_as_advanced(DEFAULT_CPPCHECK_ARGS)
 set(DEFAULT_IWYU_ARGS "-Xiwyu;any;-Xiwyu;iwyu;-Xiwyu;args")
 mark_as_advanced(DEFAULT_IWYU_ARGS)
 
-set(DEFAULT_CLANG_TIDY_WARNING_ARGS "-header-filter=.*" "-checks=-*,bugprone-*,cppcoreguidelines-avoid-goto,cppcoreguidelines-c-copy-assignment-signature,cppcoreguidelines-interfaces-global-init,cppcoreguidelines-narrowing-conversions,cppcoreguidelines-no-malloc,cppcoreguidelines-slicing,cppcoreguidelines-special-member-functions,misc-*,modernize-*,performance-*,readability-avoid-const-params-in-decls,readability-container-size-empty,readability-delete-null-pointer,readability-deleted-default,readability-else-after-return,readability-function-size,readability-identifier-naming,readability-inconsistent-declaration-parameter-name,readability-misleading-indentation,readability-misplaced-array-index,readability-non-const-parameter,readability-redundant-*,readability-simplify-*,readability-static-*,readability-string-compare,readability-uniqueptr-delete-release,readability-rary-objects")
-mark_as_advanced(DEFAULT_CLANG_TIDY_WARNING_ARGS )
+set(DEFAULT_CLANG_TIDY_CHECKS
+  "-*, \
+  bugprone-*, \
+  cppcoreguidelines-avoid-goto, \
+  cppcoreguidelines-c-copy-assignment-signature, \
+  cppcoreguidelines-interfaces-global-init, \
+  cppcoreguidelines-narrowing-conversions, \
+  cppcoreguidelines-no-malloc, \
+  cppcoreguidelines-slicing, \
+  cppcoreguidelines-special-member-functions, \
+  misc-*, \
+  -misc-non-private-member-variables-in-classes, \
+  modernize-*, \
+  -modernize-use-trailing-return-type, \
+  -modernize-use-nodiscard, \
+  performance-*, \
+  readability-avoid-const-params-in-decls, \
+  readability-container-size-empty, \
+  readability-delete-null-pointer, \
+  readability-deleted-default, \
+  readability-else-after-return, \
+  readability-function-size, \
+  readability-identifier-naming, \
+  readability-inconsistent-declaration-parameter-name, \
+  readability-misleading-indentation, \
+  readability-misplaced-array-index, \
+  readability-non-const-parameter, \
+  readability-redundant-*, \
+  readability-simplify-*, \
+  readability-static-*, \
+  readability-string-compare, \
+  readability-uniqueptr-delete-release, \
+  readability-rary-objects")
+mark_as_advanced(DEFAULT_CLANG_TIDY_CHECKS)
 
-set(DEFAULT_CLANG_TIDY_ERROR_ARGS "-header-filter=.*" "-checks=-*,bugprone-*,cppcoreguidelines-avoid-goto,cppcoreguidelines-c-copy-assignment-signature,cppcoreguidelines-interfaces-global-init,cppcoreguidelines-narrowing-conversions,cppcoreguidelines-no-malloc,cppcoreguidelines-slicing,cppcoreguidelines-special-member-functions,misc-*,modernize-*,performance-*,readability-avoid-const-params-in-decls,readability-container-size-empty,readability-delete-null-pointer,readability-deleted-default,readability-else-after-return,readability-function-size,readability-identifier-naming,readability-inconsistent-declaration-parameter-name,readability-misleading-indentation,readability-misplaced-array-index,readability-non-const-parameter,readability-redundant-*,readability-simplify-*,readability-static-*,readability-string-compare,readability-uniqueptr-delete-release,readability-rary-objects" "-warnings-as-errors=-*,bugprone-*,cppcoreguidelines-avoid-goto,cppcoreguidelines-c-copy-assignment-signature,cppcoreguidelines-interfaces-global-init,cppcoreguidelines-narrowing-conversions,cppcoreguidelines-no-malloc,cppcoreguidelines-slicing,cppcoreguidelines-special-member-functions,misc-*,modernize-*,performance-*,readability-avoid-const-params-in-decls,readability-container-size-empty,readability-delete-null-pointer,readability-deleted-default,readability-else-after-return,readability-function-size,readability-identifier-naming,readability-inconsistent-declaration-parameter-name,readability-misleading-indentation,readability-misplaced-array-index,readability-non-const-parameter,readability-redundant-*,readability-simplify-*,readability-static-*,readability-string-compare,readability-uniqueptr-delete-release,readability-rary-objects")
+set(DEFAULT_CLANG_TIDY_WARNING_ARGS "-checks=${DEFAULT_CLANG_TIDY_CHECKS}")
+message(DEPRECATED " CMake variable DEFAULT_CLANG_TIDY_WARNING_ARGS will be removed please use DEFAULT_CLANG_TIDY_CHECKS")
+mark_as_advanced(DEFAULT_CLANG_TIDY_WARNING_ARGS)
+
+set(DEFAULT_CLANG_TIDY_ERROR_ARGS "-checks=${DEFAULT_CLANG_TIDY_CHECKS}" "-warnings-as-errors=${DEFAULT_CLANG_TIDY_CHECKS}")
+message(DEPRECATED " CMake variable DEFAULT_CLANG_TIDY_ERROR_ARGS will be removed please use DEFAULT_CLANG_TIDY_CHECKS")
 mark_as_advanced(DEFAULT_CLANG_TIDY_ERROR_ARGS)
 
 # Adds clang-tidy checks to the target, with the given arguments being used
 # as the options set.
 macro(target_clang_tidy target)
-  set(oneValueArgs ENABLE)
+  set(oneValueArgs ENABLE WARNINGS_AS_ERRORS HEADER_FILTER LINE_FILTER CHECKS CONFIG ERRORS_CHECKS)
   set(multiValueArgs ARGUMENTS)
   cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -43,6 +80,36 @@ macro(target_clang_tidy target)
     if(CLANG_TIDY_EXE)
       get_target_property(${target}_type ${target} TYPE)
       if(NOT ${${target}_type} STREQUAL "INTERFACE_LIBRARY")
+        set(CLANG_TIDY_ARGUMENTS_FULL "")
+
+        if(ARG_HEADER_FILTER)
+          list(APPEND CLANG_TIDY_ARGUMENTS_FULL "--header-filter=${ARG_HEADER_FILTER}")
+        else()
+          list(APPEND CLANG_TIDY_ARGUMENTS_FULL "--header-filter=.*")
+        endif()
+
+        if(ARG_LINE_FILTER)
+          list(APPEND CLANG_TIDY_ARGUMENTS_FULL "-line-filter=${ARG_LINE_FILTER}")
+        endif()
+
+        if(ARG_CHECKS)
+          list(APPEND CLANG_TIDY_ARGUMENTS_FULL "--checks=${ARG_CHECKS}")
+        endif()
+
+        if(ARG_ERRORS_CHECKS)
+          list(APPEND CLANG_TIDY_ARGUMENTS_FULL "--warnings-as-errors=${ARG_ERRORS_CHECKS}")
+        elseif((ARG_WARNINGS_AS_ERRORS) AND (ARG_CHECKS))
+          list(APPEND CLANG_TIDY_ARGUMENTS_FULL "--warnings-as-errors=${ARG_CHECKS}")
+        endif()
+
+        if(ARG_CONFIG)
+          list(APPEND CLANG_TIDY_ARGUMENTS_FULL "--config=${ARG_CONFIG}")
+        endif()
+
+        if(ARG_ARGUMENTS)
+          list(APPEND CLANG_TIDY_ARGUMENTS_FULL "${ARG_ARGUMENTS}")
+        endif()
+
         if(ARG_ARGUMENTS)
           set_target_properties("${target}" PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE};${ARG_ARGUMENTS}")
         else()
@@ -132,31 +199,53 @@ macro(cppcheck)
   endif()
 endmacro()
 
-# Performs multiple operation so other packages may find a package
-# Usage: configure_package(NAMSPACE namespace TARGETS targetA targetb)
-#   * It installs the provided targets
-#   * It exports the provided targets under the provided namespace
-#   * It installs the package.xml file
-#   * It create and install the ${PROJECT_NAME}-config.cmake and ${PROJECT_NAME}-config-version.cmake
-macro(configure_package)
-  set(oneValueArgs NAMESPACE)
-  set(multiValueArgs TARGETS)
-  cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+# Allows Colcon to find non-Ament packages when using workspace underlays
+macro(install_ament_hooks)
+  # Allows Colcon to find non-Ament packages when using workspace underlays
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} "")
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} DESTINATION share/ament_index/resource_index/packages)
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv "prepend-non-duplicate;AMENT_PREFIX_PATH;")
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ros_package_path.dsv "prepend-non-duplicate;ROS_PACKAGE_PATH;")
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ros_package_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
+endmacro()
 
-  if (ARG_TARGETS)
-    install(TARGETS ${ARG_TARGETS}
-            EXPORT ${PROJECT_NAME}-targets
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib)
+# Install the provided targets and export to ${PROJECT_NAME}-targets
+# Usage: install_targets(TARGETS targetA targetb)
+macro(install_targets)
+  set(multiValueArgs TARGETS)
+  cmake_parse_arguments(ARG "" "" "${multiValueArgs}" ${ARGN})
+  install(TARGETS ${ARG_TARGETS}
+          EXPORT ${PROJECT_NAME}-targets
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib)
+endmacro()
+
+# Install the package.xml used for catkin and ament
+macro(install_pkgxml)
+  install(FILES package.xml DESTINATION share/${PROJECT_NAME})
+endmacro()
+
+# Performs multiple operation so other packages may find a package
+# Usage:
+#   * generate_package_config(EXPORT NAMSPACE namespace) Install export targets with provided namespace
+#   * generate_package_config(EXPORT) Install export targets with no namespace
+#   * generate_package_config() Install cmake config files and not install export targets
+#   * It exports the provided targets under the provided namespace if EXPORT option is set
+#   * It create and install the ${PROJECT_NAME}-config.cmake and ${PROJECT_NAME}-config-version.cmake
+macro(generate_package_config)
+  set(options EXPORT)
+  set(oneValueArgs NAMESPACE)
+  cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "" ${ARGN})
+
+  if (ARG_EXPORT)
     if (ARG_NAMESPACE)
       install(EXPORT ${PROJECT_NAME}-targets NAMESPACE "${ARG_NAMESPACE}::" DESTINATION lib/cmake/${PROJECT_NAME})
     else()
       install(EXPORT ${PROJECT_NAME}-targets DESTINATION lib/cmake/${PROJECT_NAME})
     endif()
   endif()
-
-  install(FILES package.xml DESTINATION share/${PROJECT_NAME})
 
   # Create cmake config files
   include(CMakePackageConfigHelpers)
@@ -173,22 +262,38 @@ macro(configure_package)
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
     DESTINATION lib/cmake/${PROJECT_NAME})
 
-  if (ARG_TARGETS)
+  if (ARG_EXPORT)
     if (ARG_NAMESPACE)
       export(EXPORT ${PROJECT_NAME}-targets NAMESPACE "${ARG_NAMESPACE}::" FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
     else()
       export(EXPORT ${PROJECT_NAME}-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
     endif()
   endif()
+endmacro()
 
-  # Allows Colcon to find non-Ament packages when using workspace underlays
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} "")
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} DESTINATION share/ament_index/resource_index/packages)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv "prepend-non-duplicate;AMENT_PREFIX_PATH;")
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ros_package_path.dsv "prepend-non-duplicate;ROS_PACKAGE_PATH;")
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ros_package_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
+# Performs multiple operation so other packages may find a package
+# Usage: configure_package(NAMSPACE namespace TARGETS targetA targetb)
+#   * It installs the provided targets
+#   * It exports the provided targets under the provided namespace
+#   * It installs the package.xml file
+#   * It create and install the ${PROJECT_NAME}-config.cmake and ${PROJECT_NAME}-config-version.cmake
+macro(configure_package)
+  set(oneValueArgs NAMESPACE)
+  set(multiValueArgs TARGETS)
+  cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+  # install package.xml
+  install_pkgxml()
+
+  # install and export targets if provided and generate package config
+  if (ARG_TARGETS)
+    install_targets(TARGETS ${ARG_TARGETS})
+    generate_package_config(EXPORT NAMESPACE ${ARG_NAMESPACE})
+  else()
+    generate_package_config(NAMESPACE ${ARG_NAMESPACE})
+  endif()
+
+  install_ament_hooks()
 endmacro()
 
 # This macro call find_package(GTest REQUIRED) and check for targets GTest::GTest and GTest::Main and if missign it will create them
@@ -298,7 +403,7 @@ macro(target_cxx_version target)
       target_compile_features("${target}" PRIVATE cxx_std_${ARG_VERSION})
     endif()
   else()
-    message(FATAL_ERROR "target_cxx_version: Must provide keywork INTERFACE | PRIVATE | PUBLIC")
+    message(FATAL_ERROR "target_cxx_version: Must provide keyword INTERFACE | PRIVATE | PUBLIC")
   endif()
 endmacro()
 
