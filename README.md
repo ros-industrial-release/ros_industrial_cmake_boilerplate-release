@@ -1,3 +1,29 @@
+## ros_industrial_cmake_boilerplate (noetic) - 0.2.13-1
+
+The packages in the `ros_industrial_cmake_boilerplate` repository were released into the `noetic` distro by running `/usr/bin/bloom-release --rosdistro noetic --track noetic ros_industrial_cmake_boilerplate --edit` on `Wed, 10 Nov 2021 17:07:38 -0000`
+
+The `ros_industrial_cmake_boilerplate` package was released.
+
+These packages were explicitly ignored:
+- `gtest`
+
+Version of package(s) in repository `ros_industrial_cmake_boilerplate`:
+
+- upstream repository: https://github.com/ros-industrial/ros_industrial_cmake_boilerplate.git
+- release repository: https://github.com/ros-industrial-release/ros_industrial_cmake_boilerplate-release.git
+- rosdistro version: `0.2.12-1`
+- old version: `0.2.12-1`
+- new version: `0.2.13-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.23`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## ros_industrial_cmake_boilerplate (noetic) - 0.2.12-1
 
 The packages in the `ros_industrial_cmake_boilerplate` repository were released into the `noetic` distro by running `/usr/bin/bloom-release ros_industrial_cmake_boilerplate --rosdistro noetic` on `Wed, 13 Oct 2021 19:24:08 -0000`
