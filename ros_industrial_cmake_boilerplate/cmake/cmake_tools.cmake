@@ -61,14 +61,6 @@ set(DEFAULT_CLANG_TIDY_CHECKS
   readability-rary-objects")
 mark_as_advanced(DEFAULT_CLANG_TIDY_CHECKS)
 
-set(DEFAULT_CLANG_TIDY_WARNING_ARGS "-checks=${DEFAULT_CLANG_TIDY_CHECKS}")
-message(DEPRECATED " CMake variable DEFAULT_CLANG_TIDY_WARNING_ARGS will be removed please use DEFAULT_CLANG_TIDY_CHECKS")
-mark_as_advanced(DEFAULT_CLANG_TIDY_WARNING_ARGS)
-
-set(DEFAULT_CLANG_TIDY_ERROR_ARGS "-checks=${DEFAULT_CLANG_TIDY_CHECKS}" "-warnings-as-errors=${DEFAULT_CLANG_TIDY_CHECKS}")
-message(DEPRECATED " CMake variable DEFAULT_CLANG_TIDY_ERROR_ARGS will be removed please use DEFAULT_CLANG_TIDY_CHECKS")
-mark_as_advanced(DEFAULT_CLANG_TIDY_ERROR_ARGS)
-
 # Adds clang-tidy checks to the target, with the given arguments being used
 # as the options set.
 macro(target_clang_tidy target)
@@ -355,7 +347,7 @@ macro(add_run_tests_target)
   if((NOT DEFINED ARG_ENABLE) OR (ARG_ENABLE))
     add_custom_target(run_tests ALL
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMAND ${CMAKE_CTEST_COMMAND} -V -O "/tmp/${PROJECT_NAME}_ctest.log" -C $<CONFIGURATION>)
+        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -V -O "/tmp/${PROJECT_NAME}_ctest.log" -C $<CONFIGURATION>)
   else()
     add_custom_target(run_tests)
   endif()
@@ -396,12 +388,14 @@ macro(target_cxx_version target)
   elseif(ARG_PUBLIC)
     if(CXX_FEATURE_FOUND EQUAL "-1")
       set_property(TARGET ${target} PROPERTY CXX_STANDARD ${ARG_VERSION})
+      set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
     else()
       target_compile_features("${target}" PUBLIC cxx_std_${ARG_VERSION})
     endif()
   elseif(ARG_PRIVATE)
     if(CXX_FEATURE_FOUND EQUAL "-1")
       set_property(TARGET ${target} PROPERTY CXX_STANDARD ${ARG_VERSION})
+      set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
     else()
       target_compile_features("${target}" PRIVATE cxx_std_${ARG_VERSION})
     endif()
