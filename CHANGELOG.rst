@@ -2,6 +2,11 @@
 Changelog for package ros_industrial_cmake_boilerplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.14 (2021-12-03)
+-------------------
+* Add newer version of clang-tidy to the list
+* Contributors: Levi Armstrong
+
 0.2.13 (2021-11-10)
 -------------------
 * Add --output-on-failure to add_run_test_target
