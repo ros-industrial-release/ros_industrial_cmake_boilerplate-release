@@ -45,7 +45,7 @@ tracks:
     name: upstream
     patches: null
     release_inc: '1'
-    release_repo_url: null
+    release_repo_url: git@github.com:ros-industrial-release/ros_industrial_cmake_boilerplate-release.git
     release_tag: :{version}
     ros_distro: noetic
     vcs_type: git
