@@ -1,3 +1,28 @@
+## ros_industrial_cmake_boilerplate (melodic) - 0.2.14-1
+
+The packages in the `ros_industrial_cmake_boilerplate` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --rosdistro melodic --track melodic ros_industrial_cmake_boilerplate` on `Sat, 04 Dec 2021 01:01:56 -0000`
+
+These packages were released:
+- `gtest`
+- `ros_industrial_cmake_boilerplate`
+
+Version of package(s) in repository `ros_industrial_cmake_boilerplate`:
+
+- upstream repository: https://github.com/ros-industrial/ros_industrial_cmake_boilerplate.git
+- release repository: https://github.com/ros-industrial-release/ros_industrial_cmake_boilerplate-release.git
+- rosdistro version: `0.2.13-1`
+- old version: `0.2.13-1`
+- new version: `0.2.14-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## ros_industrial_cmake_boilerplate (melodic) - 0.2.13-1
 
 The packages in the `ros_industrial_cmake_boilerplate` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --rosdistro melodic --track melodic ros_industrial_cmake_boilerplate` on `Thu, 02 Dec 2021 15:09:47 -0000`
