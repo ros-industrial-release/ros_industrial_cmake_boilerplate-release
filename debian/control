@@ -1,0 +1,12 @@
+Source: ros-foxy-gtest
+Section: misc
+Priority: optional
+Maintainer: Levi Armstrong <levi.armstrong@swri.org>
+Build-Depends: debhelper (>= 9.0.0), git, ros-foxy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-foxy-gtest
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-foxy-ros-workspace
+Description: Gtest Package
