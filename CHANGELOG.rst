@@ -2,6 +2,11 @@
 Changelog for package ros_industrial_cmake_boilerplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.1 (2022-08-25)
+------------------
+* Fix code coverage macro to support plain visibility
+* Contributors: Levi Armstrong
+
 0.3.0 (2022-07-05)
 ------------------
 * Fix target_code_coverage to support targets with plain visibility
