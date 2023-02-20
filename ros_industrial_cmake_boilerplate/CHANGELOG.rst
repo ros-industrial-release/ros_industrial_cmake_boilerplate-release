@@ -2,6 +2,29 @@
 Changelog for package ros_industrial_cmake_boilerplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.0 (2023-02-20)
+------------------
+
+0.3.1 (2022-08-25)
+------------------
+* Fix code coverage macro to support plain visibility
+* Contributors: Levi Armstrong
+
+0.3.0 (2022-07-05)
+------------------
+* Fix target_code_coverage to support targets with plain visibility
+* Update target_cxx_version to support windows
+* Add missing include(GoogleTest) to find_gtest() macro
+* Update package CI to use colcon
+* Contributors: Levi Armstrong
+
+0.2.16 (2022-06-22)
+-------------------
+* Always treat package description as a single string during extraction
+* Fix cpack to generate correct names for nuget packages (`#64 <https://github.com/ros-industrial/ros_industrial_cmake_boilerplate/issues/64>`_)
+* Added CPack macro from tesseract (`#62 <https://github.com/ros-industrial/ros_industrial_cmake_boilerplate/issues/62>`_)
+* Contributors: Josh Langsfeld, Levi Armstrong, Michael Ripperger
+
 0.2.15 (2022-01-30)
 -------------------
 * Add missing one value arg NAMESPACE to configure_package
