@@ -1,3 +1,26 @@
+## ros_industrial_cmake_boilerplate (humble) - 0.4.0-1
+
+The packages in the `ros_industrial_cmake_boilerplate` repository were released into the `humble` distro by running `/usr/bin/bloom-release --rosdistro humble --track humble ros_industrial_cmake_boilerplate` on `Mon, 20 Feb 2023 18:06:26 -0000`
+
+The `ros_industrial_cmake_boilerplate` package was released.
+
+Version of package(s) in repository `ros_industrial_cmake_boilerplate`:
+
+- upstream repository: https://github.com/ros-industrial/ros_industrial_cmake_boilerplate.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `0.4.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.22.1`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## ros_industrial_cmake_boilerplate (rolling) - 0.4.0-1
 
 The packages in the `ros_industrial_cmake_boilerplate` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling ros_industrial_cmake_boilerplate` on `Mon, 20 Feb 2023 18:01:36 -0000`
