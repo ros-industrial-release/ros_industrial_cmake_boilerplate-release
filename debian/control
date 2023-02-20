@@ -1,0 +1,12 @@
+Source: ros-humble-ros-industrial-cmake-boilerplate
+Section: misc
+Priority: optional
+Maintainer: Levi Armstrong <Levi.Armstrong@swri.org>
+Build-Depends: debhelper (>= 9.0.0), cmake, cppcheck <!nocheck>, iwyu <!nocheck>, lcov <!nocheck>, libclang-dev <!nocheck>, libgtest-dev <!nocheck>, ros-humble-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-humble-ros-industrial-cmake-boilerplate
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-humble-ros-workspace
+Description: Contains boilerplate cmake script, macros and utils
