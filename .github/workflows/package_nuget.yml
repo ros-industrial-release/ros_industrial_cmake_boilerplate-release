@@ -1,0 +1,60 @@
+name:  Package-Windows-Build
+
+on:
+  push:
+    tags:
+      - '*'
+
+  # allow manually starting this workflow
+  workflow_dispatch:
+
+jobs:
+  NuGet:
+    name: Windows-2019
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        path: workspace/src/ros_industrial_cmake_boilerplate
+
+    - name: Create artifacts directory
+      run: |
+        mkdir artifacts
+
+    - name: install-depends
+      shell: cmd
+      run: |
+        vcpkg integrate install
+        python -m pip install vcstool -q
+        python -m pip install colcon-common-extensions -q
+        python -m pip install ninja -q
+
+    - name: configure-msvc
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: build-workspace
+      working-directory: workspace
+      shell: cmd
+      run: |
+        colcon build --event-handlers console_direct+ --cmake-args -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DRICB_PACKAGE=ON
+        if %ERRORLEVEL% GEQ 1 exit 1
+
+    - name: Package
+      working-directory: workspace/build/ros_industrial_cmake_boilerplate
+      run: |
+        cpack --config CPackConfig.cmake
+        cp ./*.nupkg ${{ github.workspace }}/artifacts
+        cp ./*.tar.xz ${{ github.workspace }}/artifacts
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: nuget_package
+        path: ${{ github.workspace }}/artifacts/*.nupkg
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: archive_package
+        path: ${{ github.workspace }}/artifacts/*.tar.xz
+
