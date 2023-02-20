@@ -2,6 +2,9 @@
 Changelog for package ros_industrial_cmake_boilerplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.0 (2023-02-20)
+------------------
+
 0.3.1 (2022-08-25)
 ------------------
 * Fix code coverage macro to support plain visibility
