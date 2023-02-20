@@ -393,6 +393,7 @@ macro(find_gtest)
       endif()
     endif()
   endif()
+  include(GoogleTest)
 endmacro()
 
 # This macro call the appropriate gtest function to add a test based on the cmake version
@@ -452,7 +453,11 @@ macro(target_cxx_version target)
   list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_${ARG_VERSION} CXX_FEATURE_FOUND)
   if (ARG_INTERFACE)
     if(CXX_FEATURE_FOUND EQUAL "-1")
-      target_compile_options("${target}" INTERFACE -std=c++${ARG_VERSION})
+      if(WIN32)
+        target_compile_options("${target}" INTERFACE "/std:c++${ARG_VERSION}")
+      else()
+        target_compile_options("${target}" INTERFACE -std=c++${ARG_VERSION})
+      endif()
     else()
       target_compile_features("${target}" INTERFACE cxx_std_${ARG_VERSION})
     endif()
@@ -460,6 +465,13 @@ macro(target_cxx_version target)
     if(CXX_FEATURE_FOUND EQUAL "-1")
       set_property(TARGET ${target} PROPERTY CXX_STANDARD ${ARG_VERSION})
       set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
+      if(WIN32 AND MSVC_VERSION GREATER_EQUAL "1900" AND CMAKE_VERSION LESS 3.10)
+        include(CheckCXXCompilerFlag)
+        check_cxx_compiler_flag("/std:c++${ARG_VERSION}" _cpp_latest_flag_supported)
+        if(_cpp_latest_flag_supported)
+          target_compile_options("${target}" PUBLIC "/std:c++${ARG_VERSION}")
+        endif()
+      endif()
     else()
       target_compile_features("${target}" PUBLIC cxx_std_${ARG_VERSION})
     endif()
@@ -467,6 +479,13 @@ macro(target_cxx_version target)
     if(CXX_FEATURE_FOUND EQUAL "-1")
       set_property(TARGET ${target} PROPERTY CXX_STANDARD ${ARG_VERSION})
       set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
+      if(WIN32 AND MSVC_VERSION GREATER_EQUAL "1900" AND CMAKE_VERSION LESS 3.10)
+        include(CheckCXXCompilerFlag)
+        check_cxx_compiler_flag("/std:c++${ARG_VERSION}" _cpp_latest_flag_supported)
+        if(_cpp_latest_flag_supported)
+          target_compile_options("${target}" PUBLIC "/std:c++${ARG_VERSION}")
+        endif()
+      endif()
     else()
       target_compile_features("${target}" PRIVATE cxx_std_${ARG_VERSION})
     endif()
@@ -502,3 +521,64 @@ else()
   message(STATUS "cppcheck not found!")
   set(CMAKE_CXX_CPPCHECK "" CACHE STRING "" FORCE) # delete it
 endif()
+
+macro(cpack)
+  set(oneValueArgs
+      VERSION
+      MAINTAINER
+      VENDOR
+      DESCRIPTION
+      LICENSE_FILE
+      README_FILE
+      PACKAGE_PREFIX)
+  set(multiValueArgs LINUX_DEPENDS WINDOWS_DEPENDS)
+  cmake_parse_arguments(
+    ARG
+    ""
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN})
+
+  set(CPACK_PACKAGE_VENDOR ${ARG_VENDOR})
+  set(CPACK_RESOURCE_FILE_LICENSE ${ARG_LICENSE_FILE})
+  set(CPACK_RESOURCE_FILE_README ${ARG_README_FILE})
+  string(
+    REPLACE "_"
+            "-"
+            PACKAGE_NAME
+            ${PROJECT_NAME})
+  if(UNIX)
+    set(CPACK_GENERATOR "DEB;TXZ")
+
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+      set(DEB_ARCH "amd64")
+    else()
+      set(DEB_ARCH ${CMAKE_SYSTEM_PROCESSOR})
+    endif()
+
+    set(CPACK_PACKAGE_FILE_NAME "${ARG_PACKAGE_PREFIX}${PACKAGE_NAME}_${DEB_ARCH}_linux_${ARG_VERSION}")
+    set(CPACK_DEBIAN_PACKAGE_NAME "${ARG_PACKAGE_PREFIX}${PACKAGE_NAME}")
+    set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCH})
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${ARG_MAINTAINER})
+    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION ${ARG_DESCRIPTION})
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS=ON)
+    string(
+      REPLACE ";"
+              ","
+              CPACK_DEBIAN_PACKAGE_DEPENDS
+              "${ARG_LINUX_DEPENDS}")
+  elseif(WIN32)
+    set(CPACK_GENERATOR "NuGet;TXZ")
+    set(CPACK_PACKAGE_FILE_NAME
+        "${ARG_PACKAGE_PREFIX}${PACKAGE_NAME}_${CMAKE_SYSTEM_PROCESSOR}_windows_${ARG_VERSION}")
+    set(CPACK_NUGET_PACKAGE_NAME
+        "${ARG_PACKAGE_PREFIX}${PACKAGE_NAME}_${CMAKE_SYSTEM_PROCESSOR}_windows")
+    set(CPACK_NUGET_PACKAGE_DESCRIPTION ${ARG_DESCRIPTION})
+    string(
+      REPLACE ";"
+              ","
+              CPACK_NUGET_PACKAGE_DEPENDENCIES
+              "${ARG_WINDOWS_DEPENDS}")
+  endif()
+  include(CPack)
+endmacro()
