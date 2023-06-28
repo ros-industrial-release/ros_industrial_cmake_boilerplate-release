@@ -10,8 +10,9 @@ on:
 
 jobs:
   Debian:
-    name: Noetic
+    name: Ubuntu Focal
     runs-on: ubuntu-latest
+    container: ubuntu:20.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -19,17 +20,17 @@ jobs:
 
       - name: Create artifacts directory
         run: |
-          mkdir artifacts
+          mkdir -p ${{ github.workspace }}/artifacts
 
       - name: Install dependencies
         working-directory: workspace
         run: |
-          pwd
-          sudo apt update -q
-          sudo apt install -q -y clang-tidy python3 python3-pip
-          sudo pip3 install -q --upgrade pip
-          sudo pip3 install -q colcon-common-extensions rosdep vcstool
-          sudo rosdep init -q
+          export DEBIAN_FRONTEND=noninteractive
+          apt update -q
+          apt install -q -y clang-tidy python3 python3-pip
+          pip3 install -q --upgrade pip
+          pip3 install -q colcon-common-extensions rosdep vcstool
+          rosdep init -q
           rosdep update -q
           rosdep install --from-paths src --ignore-src -r -y -q
 

@@ -2,6 +2,45 @@
 Changelog for package ros_industrial_cmake_boilerplate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.7 (2023-06-27)
+------------------
+* Add python hook to install_ament_hooks
+* Contributors: Levi Armstrong
+
+0.4.6 (2023-03-06)
+------------------
+* Fix artifacts directory in github actions (`#77 <https://github.com/marip8/cmake_common_scripts/issues/77>`_)
+* Contributors: Chris Schindlbeck
+
+0.4.5 (2023-02-28)
+------------------
+* Make deps installation non-interactive (`#76 <https://github.com/marip8/cmake_common_scripts/issues/76>`_)
+* Contributors: Michael Ripperger
+
+0.4.4 (2023-02-28)
+------------------
+* Removed sudo from CI commands (`#75 <https://github.com/marip8/cmake_common_scripts/issues/75>`_)
+* Contributors: Michael Ripperger
+
+0.4.3 (2023-02-28)
+------------------
+* Fixed CI yaml file (`#74 <https://github.com/marip8/cmake_common_scripts/issues/74>`_)
+* Contributors: Michael Ripperger
+
+0.4.2 (2023-02-28)
+------------------
+* Minor Updates (`#73 <https://github.com/marip8/cmake_common_scripts/issues/73>`_)
+  * Updated relative locations of license and README files
+  * Updated debian build job to run on Ubuntu 20.04
+* Contributors: Michael Ripperger
+
+0.4.1 (2023-02-28)
+------------------
+* Organization Updates (`#72 <https://github.com/ros-industrial/ros_industrial_cmake_boilerplate/issues/72>`_)
+  * Removed ricb subdirectory
+  * Updated maintainer information
+* Contributors: Michael Ripperger
+
 0.4.0 (2023-02-20)
 ------------------
 
