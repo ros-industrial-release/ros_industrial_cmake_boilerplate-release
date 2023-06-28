@@ -1,0 +1,58 @@
+name: Package-Debian-Build
+
+on:
+  push:
+    tags:
+      - '*'
+
+  # allow manually starting this workflow
+  workflow_dispatch:
+
+jobs:
+  Debian:
+    name: Ubuntu Focal
+    runs-on: ubuntu-latest
+    container: ubuntu:20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: workspace/src/ros_industrial_cmake_boilerplate
+
+      - name: Create artifacts directory
+        run: |
+          mkdir -p ${{ github.workspace }}/artifacts
+
+      - name: Install dependencies
+        working-directory: workspace
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          apt update -q
+          apt install -q -y clang-tidy python3 python3-pip
+          pip3 install -q --upgrade pip
+          pip3 install -q colcon-common-extensions rosdep vcstool
+          rosdep init -q
+          rosdep update -q
+          rosdep install --from-paths src --ignore-src -r -y -q
+
+      - name: Build
+        working-directory: workspace
+        run: |
+          colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release -DRICB_PACKAGE=ON
+          if [ $? -ne 0 ]; then exit 1; fi
+
+      - name: Package
+        working-directory: workspace/build/ros_industrial_cmake_boilerplate
+        run: |
+          cpack --config CPackConfig.cmake
+          cp ./*.deb ${{ github.workspace }}/artifacts
+          cp ./*.tar.xz ${{ github.workspace }}/artifacts
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: debian_package
+          path: ${{ github.workspace }}/artifacts/*.deb
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: archive_package
+          path: ${{ github.workspace }}/artifacts/*.tar.xz
