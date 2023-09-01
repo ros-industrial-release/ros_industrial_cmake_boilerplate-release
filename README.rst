@@ -201,21 +201,130 @@ This CMake macro will add CppCheck to all targets with default arguments.
 
    cppcheck(ARGUMENTS ${DEFAULT_CPPCHECK_ARGS})
 
+CPack
+=====
+
+Configure Package Without Components
+------------------------------------
+Configure package for cpack which does not leverage components
+
+* One Value Args:
+   * VERSION          - The package version
+   * MAINTAINER_NAME  - The package maintainer name
+   * MAINTAINER_EMAIL - The package maintainer email
+   * VENDOR           - The package vender
+   * DESCRIPTION      - The package description
+   * LICENSE_FILE     - The package license file
+   * README_FILE      - The package readme
+   * PACKAGE_PREFIX   - The package prefix applied to all cpack generated files
+* Multi Value Args:
+   * LINUX_DEPENDS     - The linux dependencies required via apt install
+   * WINDOWS_DEPENDS   - The windows dependencies required via nuget install
+
+.. code-block:: cmake
+
+   cpack(
+     VERSION ${pkg_extracted_version}
+     MAINTAINER <https://github.com/ros-industrial-consortium/tesseract>
+     DESCRIPTION ${pkg_extracted_description}
+     LICENSE_FILE ${CMAKE_CURRENT_LIST_DIR}/../LICENSE
+     README_FILE ${CMAKE_CURRENT_LIST_DIR}/../README.md
+     LINUX_DEPENDS
+       "libboost-system-dev"
+       "libboost-filesystem-dev"
+       "libboost-serialization-dev"
+       "libconsole-bridge-dev"
+       "libtinyxml2-dev"
+       "libeigen3-dev"
+       "libyaml-cpp-dev"
+     WINDOWS_DEPENDS
+       "boost_system"
+       "boost_filesystem;"
+       "boost_serialization"
+       "console-bridge"
+       "tinyxml2"
+       "Eigen3"
+       "yaml-cpp")
+
+Configure Package With Components
+---------------------------------
+This requires two macros one used in the components cmake file another for the top most package cmake file.
+
+Configure Component
+^^^^^^^^^^^^^^^^^^^
+Configure components for cpack
+
+* One Value Args:
+   * COMPONENT      - The component name
+   * VERSION        - The package version
+   * DESCRIPTION    - The package description
+   * PACKAGE_PREFIX - The package prefix applied to all cpack generated files
+* Multi Value Args:
+   * LINUX_DEPENDS     - The linux dependencies required via apt install
+   * WINDOWS_DEPENDS   - The windows dependencies required via nuget install
+   * COMPONENT_DEPENDS - The component dependencies required from this package
+
+.. code-block:: cmake
+
+   cpack_component(
+     COMPONENT IKFAST # must be uppercase
+     VERSION ${pkg_extracted_version}
+     DESCRIPTION "Tesseract Kinematics ikfast implementation"
+     COMPONENT_DEPENDS core)
+
+Configure Components Package
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Configure package leveraging components for cpack
+
+* One Value Args:
+   * VERSION          - The package version
+   * MAINTAINER_NAME  - The package maintainer name
+   * MAINTAINER_EMAIL - The package maintainer email
+   * VENDOR           - The package vender
+   * DESCRIPTION      - The package description
+   * LICENSE_FILE     - The package license file
+   * README_FILE      - The package readme
+   * PACKAGE_PREFIX   - The package prefix applied to all cpack generated files
+
+.. code-block:: cmake
+
+   cpack_component_package(
+     VERSION ${pkg_extracted_version}
+     MAINTAINER <https://github.com/ros-industrial-consortium/tesseract>
+     DESCRIPTION ${pkg_extracted_description}
+     LICENSE_FILE ${CMAKE_CURRENT_LIST_DIR}/../LICENSE
+     README_FILE ${CMAKE_CURRENT_LIST_DIR}/../README.md)
+
 
 Configure (Pure CMake Package)
 ==============================
 This CMake macro simplifies the CMake package configure and install by performing multiple operations
 
-* It installs the provided targets
-* It exports the provided targets under the provided namespace
-* It installs the package.xml file
-* It creates and installs the ${PROJECT_NAME}-config.cmake and ${PROJECT_NAME}-config-version.cmake
+Configure Package
+-----------------
+Performs multiple operation so other packages may find a package
+
+If Namespace is provided but no targets it is assumed targets were installed and must be exported
+
+* One Value Args:
+   * NAMESPACE - This will prepend <namespace>:: to the target names as they are written to the import file
+* Multi Value Args:
+   * TARGETS      - The targets from the project to be installed
+   * COMPONENTS   - The packages supported find_package components if any
+   * DEPENDENCIES - The dependencies to be written to the packages Config.cmake file
+   * CFG_EXTRAS   - The extra cmake files to be include in the packages Config.cmake file
+* Usage:
+   * It installs the provided targets
+   * It exports the provided targets under the provided namespace
+   * It installs the package.xml file
+   * It creates and installs the ${PROJECT_NAME}-config.cmake and ${PROJECT_NAME}-config-version.cmake
 
 .. code-block:: cmake
 
    configure_package(
      NAMESPACE <PACKAGE_NAMESPACE>
      TARGETS <TARGET_NAME_A> <TARGET_NAME_B>
+     COMPONENTS <COMPONENT_NAME_A> <COMPONENT_NAME_B>
      DEPENDENCIES <deps>...
      CFG_EXTRAS <cmake files>...
    )
@@ -245,13 +354,75 @@ arguments listed by ``DEPENDENCIES``. Additional configuration CMake scripts can
 with relative paths listed in the ``CFG_EXTRAS`` argument. The scripts should be installed alongside
 the generated package config file, in ``lib/cmake/${PROJECT_NAME}``.
 
+
+Configure Component
+-------------------
+Performs multiple operation so other packages may find a package's component
+
+If Namespace is provided but no targets it is assumed targets were installed and must be exported
+
+* One Value Args:
+   * NAMESPACE - This will prepend <namespace>:: to the target names as they are written to the import file
+   * COMPONENT - The component name
+* Multi Value Args:
+   * TARGETS      - The targets from the project to be installed
+   * DEPENDENCIES - The dependencies to be written to the packages Config.cmake file
+   * CFG_EXTRAS   - The extra cmake files to be include in the packages Config.cmake file
+* Usage:
+   * It installs the provided targets
+   * It exports the provided targets under the provided namespace
+
+.. code-block:: cmake
+
+   configure_component(
+     COMPONENT <COMPONENT_NAME>
+     NAMESPACE <PACKAGE_NAMESPACE>
+     TARGETS <TARGET_NAME_A> <TARGET_NAME_B>
+     DEPENDENCIES <deps>...
+     CFG_EXTRAS <cmake files>...
+   )
+
+Example:
+
+.. code-block:: cmake
+
+   configure_component(
+     COMPONENT
+       kdl
+     NAMESPACE
+       tesseract
+     TARGETS
+       ${PROJECT_NAME}_kdl ${PROJECT_NAME}_kdl_factories
+     DEPENDENCIES
+       Eigen3
+       TinyXML2
+       yaml-cpp
+       "Boost COMPONENTS system filesystem serialization"
+     CFG_EXTRAS
+       cmake/tesseract_common-extras.cmake
+   )
+
+To create the config cmake file, the macro by default looks for a configuration template
+``cmake/<COMPONENT_NAME>-config.cmake.in`` provided by the package. If not present, a default one
+will be generated. If generated automatically, package dependencies will be included from the
+arguments listed by ``DEPENDENCIES``. Additional configuration CMake scripts can also be included
+with relative paths listed in the ``CFG_EXTRAS`` argument. The scripts should be installed alongside
+the generated package config file, in ``lib/cmake/${PROJECT_NAME}``.
+
+
 Sub macros used in configure the package
 ----------------------------------------
 The following macros are used by configure_package and can be used independently if needed
 
 Install Targets
 ^^^^^^^^^^^^^^^
-This will install along with export them to ${PROJECT_NAME}-targets
+This will install targets along associated with the provided component and export them to ${ARG_COMPONENT}-targets
+
+* One Value Args:
+   * COMPONENT (Optional) - The component name to associate the targets with, if not provided ${PROJECT_NAME} is used
+* Multi Value Args:
+   * TARGETS - The targets from the project to be installed
+
 
 .. code-block:: cmake
 
@@ -267,21 +438,50 @@ This will install the package.xml file
 
 Generate CMake Config Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This will generate and install CMake config files.
+Performs multiple operation so other packages may find a package and package components
+The default export name is ${PROJECT_NAME} but it can be overriden by providing EXPORT_NAME
+
+* Options:
+   * EXPORT    - indicate if trargets should be exported
+* One Value Args:
+   * COMPONENT (Optional)   - the name given to the export ${ARG_COMPONENT}-targets, if not provided PROJECT_NAME is used
+   * CONFIG_NAME (Optional) - the name given to the export ${ARG_COMPONENT}-config.cmake, if not provided COMPONENT is used
+   * NAMESPACE (Optional)   - the namespace assigned for exported targets
+* Multi Value Args:
+   * DEPENDENCIES (Optional)         - list of dependencies to be loaded in the package config
+   * CFG_EXTRAS (Optional)           - list of extra cmake config files to be loaded in package config
+   * SUPPORTED_COMPONENTS (Optional) - list of supported components
+* Usage:
+   * generate_package_config(EXPORT NAMSPACE namespace) Install export targets with provided namespace
+   * generate_package_config(EXPORT) Install export targets with no namespace
+   * generate_package_config() Install cmake config files and not install export targets
+   * It exports the provided targets under the provided namespace ${ARG_COMPONENT}-targets, if EXPORT option is set
+   * It creates and install the ${ARG_CONFIG_NAME}-config.cmake
+   * In not component, it create and installs ${ARG_CONFIG_NAME}-config-version.cmake
+
 
 .. code-block:: cmake
 
-   # Install export targets with provided namespace
+   # Install and export targets with provided namespace
    generate_package_config(EXPORT NAMSPACE namespace)
 
-   #Install export targets with no namespace
+   #Install and export targets with no namespace
    generate_package_config(EXPORT)
 
    # Install CMake config files and not install export targets
    generate_package_config() Install CMake config files and not install export targets
 
-Additionally, ``DEPENDENCIES`` and ``CFG_EXTRAS`` are passed for generated CMake config files as with
-`configure_package`.
+   # Install and export targets for package with components
+   generate_package_config(EXPORT CONFIG_NAME ${PROJECT_NAME} SUPPORTED_COMPONENTS componentA componentB)
+
+   # Install and export targets for component
+   generate_package_config(EXPORT
+     COMPONENT kdl
+     NAMESPACE namespace
+     DEPENDENCIES packageA packageB
+     CFG_EXTRAS extraA.cmake extraB.cmake)
+
+Additionally, ``DEPENDENCIES``, ``CFG_EXTRAS`` and ``SUPPORTED_COMPONENTS`` are passed for generated CMake config files.
 
 Install Ament Hooks
 ^^^^^^^^^^^^^^^^^^^
@@ -380,6 +580,18 @@ To add coverage targets, such as calling `make ccov` to generate the actual cove
 
 .. note:: Each of the macros can take an ENABLE ON/OFF so they can easily be enabled by an external flag. If not provided it is automatically enabled.
 
+Exclude Code From Code Coverage
+-------------------------------
+
+================== ===========
+Keyword             Description
+================== ===========
+LCOV_EXCL_LINE     Lines containing this marker will be excluded.
+LCOV_EXCL_START    Marks the beginning of an excluded section. The current line is part of this section.
+LCOV_EXCL_STOP     Marks the end of an excluded section. The current line not part of this section.
+================== ===========
+
+.. note:: You can replace LCOV above with GCOV or GCOVR.
 
 Example 1: All targets instrumented
 -----------------------------------
